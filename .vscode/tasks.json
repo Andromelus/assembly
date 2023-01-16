@@ -4,10 +4,20 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Run hello_world",
+            "label": "Build And Run (asm)",
             "type": "shell",
-            "command": "nasm -f elf -g -F stabs ./hello_world/main.asm && ld -o ./hello_world/main ./hello_world/main.o -m elf_i386 && ./hello_world/main",
+            "command": "nasm -f elf -g -F stabs ./${input:program_name}/main.asm && ld -o ./${input:program_name}/main ./${input:program_name}/main.o -m elf_i386 && ./${input:program_name}/main",
             "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "program_name",
+            "type": "pickString",
+            "options": [
+                "hello_world"
+            ],
+            "description": "The program concerned by the command"
         }
     ]
 }
