@@ -8,6 +8,12 @@
             "type": "shell",
             "command": "cd ./${input:program_name} && make && ./main.exe",
             "problemMatcher": []
+        },
+        {
+            "label": "Debug (asm)",
+            "type": "shell",
+            "command": "cd ./${input:program_name} && kdbg ./main.exe",
+            "dependsOn": ["Assemble, Link And Run"]
         }
     ],
     "inputs": [
