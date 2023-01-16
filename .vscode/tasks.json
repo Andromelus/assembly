@@ -4,16 +4,22 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Assemble, Link And Run",
+            "label": "Assemble, Link and Run",
             "type": "shell",
             "command": "cd ./${input:program_name} && make && ./main.exe",
             "problemMatcher": []
         },
         {
+            "label": "Assemble and Link",
+            "type": "shell",
+            "command": "cd ./${input:program_name} && make",
+            "problemMatcher": []
+        }
+        {
             "label": "Debug (asm)",
             "type": "shell",
             "command": "cd ./${input:program_name} && kdbg ./main.exe",
-            "dependsOn": ["Assemble, Link And Run"]
+            "dependsOn": ["Assemble and Link"]
         }
     ],
     "inputs": [
