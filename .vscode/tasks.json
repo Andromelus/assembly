@@ -1,0 +1,35 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Assemble, Link and Run",
+            "type": "shell",
+            "command": "cd ./${input:program_name} && make && ./main.exe",
+            "problemMatcher": []
+        },
+        {
+            "label": "Assemble and Link",
+            "type": "shell",
+            "command": "cd ./${input:program_name} && make",
+            "problemMatcher": []
+        }
+        {
+            "label": "Debug (asm)",
+            "type": "shell",
+            "command": "cd ./${input:program_name} && kdbg ./main.exe",
+            "dependsOn": ["Assemble and Link"]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "program_name",
+            "type": "pickString",
+            "options": [
+                "hello_world"
+            ],
+            "description": "The program concerned by the command"
+        }
+    ]
+}
