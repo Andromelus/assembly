@@ -4,9 +4,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build And Run (asm)",
+            "label": "Assemble, Link And Run",
             "type": "shell",
-            "command": "nasm -f elf -g -F stabs ./${input:program_name}/main.asm && ld -o ./${input:program_name}/main ./${input:program_name}/main.o -m elf_i386 && ./${input:program_name}/main",
+            "command": "cd ./${input:program_name} && make && ./main.exe",
             "problemMatcher": []
         }
     ],
