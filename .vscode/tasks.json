@@ -1,0 +1,13 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run hello_world",
+            "type": "shell",
+            "command": "nasm -f elf -g -F stabs ./hello_world/main.asm && ld -o ./hello_world/main ./hello_world/main.o -m elf_i386 && ./hello_world/main",
+            "problemMatcher": []
+        }
+    ]
+}
