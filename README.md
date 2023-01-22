@@ -37,7 +37,8 @@ Tools:
   - Accessed through immediate addressing, means the item is built into the machine instruction. Cpu does not go anywhere to find it
   - THe source code is stored in memory, so pulling data from a register is still faster
 
-## MOV
+
+## MOV
 
 Move data from an address in memory to another address in memory, or to a register.
 
@@ -54,3 +55,16 @@ string: db "my string"  ; store into string the memoery address of the string "m
 mov ecx, string         ; move into ecx register the address of the string
 mov edx, [string]       ; move into edx register the value of the string located at string
 ```
+
+## JNZ - Jump if Not Zero
+
+
+
+Jump to a label if the ZF flag is not set (value = 0). Example:
+```assembly
+    mov eax, 5
+do_more:
+    dev eax
+    jnz do_more
+```
+--> As long as the value of eax is not 0, keep "decrement" eax. When eax reaches 0, end.
