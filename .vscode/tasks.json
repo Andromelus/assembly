@@ -27,7 +27,8 @@
             "id": "program_name",
             "type": "pickString",
             "options": [
-                "hello_world"
+                "hello_world",
+                "sandbox"
             ],
             "description": "The program concerned by the command"
         }
