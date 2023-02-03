@@ -2,6 +2,19 @@
 
 Some assembly code.
 
+- [Introduction](#introduction)
+- [Environment](#environment)
+- [Notes](#notes)
+  - [Conventions](#conventions)
+  - [Data types](#data-types)
+  - [MOV](#mov)
+  - [JNZ - Jump if Not Zero](#jnz---jump-if-not-zero)
+- [ATOI](#atoi)
+  - [Code](#code)
+  - [Explanation](#explanation)
+    - [Global concept](#global-concept)
+    - [Example](#example)
+
 # Environment
 
 Unless specified otherwise, all these programs have been developped on:
@@ -68,3 +81,76 @@ do_more:
     jnz do_more
 ```
 --> As long as the value of eax is not 0, keep "decrement" eax. When eax reaches 0, end.
+
+# ATOI
+
+ATOI = Ascii TO Integer
+
+## Code
+The program is the following (Thanks to [tnewman](https://gist.github.com/tnewman/63b64284196301c4569f750a08ef52b2)):
+
+```nasm
+atoi:
+    mov rax, 0              ; Set initial total to 0
+     
+convert:
+    movzx rsi, byte [rdi]   ; Get the current character
+    test rsi, rsi           ; Check for \0
+    je done
+   
+    cmp rsi, 48             ; Anything less than 0 is invalid
+    jl error
+   
+    cmp rsi, 57             ; Anything greater than 9 is invalid
+    jg error
+     
+    sub rsi, 48             ; Convert from ASCII to decimal
+    imul rax, 10            ; Multiply total by 10
+    add rax, rsi            ; Add current digit to total
+   
+    inc rdi                 ; Get the address of the next character
+    jmp convert
+
+error:
+    mov rax, -1             ; Return -1 on error
+ 
+done:
+    ret                     ; Return total or error code
+```
+
+## Explanation
+
+### Global concept
+
+Assuming that the input is provided as ASCII character, this program loops through all characters (here, stored in rdi). For each character
+- test if the character is an integer (``cmp rsi, 48`` and ``cmp rsi, 57``)
+- Substitue 48 to the value of the character
+  - in ASCII, the decimal value of the "0" character is 48d. Consequently, substituing 48d brings the decimal value to 0d (for char "0") up to 9d (for char "9") (Check an ASCII table for visual representation)
+- Multiply the current integer by 10, to "shift" the highest number value from right to left (see table bellow)
+- add the value of rsi to the final result
+
+### Example
+
+Given the following input: "12" (ASCII characters)
+
+
+| INSTRUCTION                   | RAX (bytes) | RSI (decimal) | RSI (bytes) | RSI (char) |
+| ----------------------------- | ----------- | ------------- | ----------- | ---------- |
+| atoi: mov rax,0               | 0000        |               |             |            |
+| convert: movzx rsi, byte[rdi] | 0000        | 49            | 0100 1001   | 1          |
+| convert: sub rsi, 48          | 0000        | 1             | 0001        | SOH        |
+| convert: imul rax, 10         | 0000        | 1             | 0001        | SOH        |
+| convert: add rax, rsi         | 0001        | 1             | 0001        | SOH        |
+
+At this point, the character "1" has been processed. The value of the integer calculated is 1 (rax = 0000 0001b)
+
+----
+
+| INSTRUCTION                   | RAX (bytes) | RSI (decimal) | RSI (bytes) | RSI (char) |
+| ----------------------------- | ----------- | ------------- | ----------- | ---------- |
+| convert: movzx rsi, byte[rdi] | 0001        | 50            | 0101 0000   | 2          |
+| convert: sub rsi, 48          | 0001        | 2             | 0010        | STX        |
+| convert: imul rax, 10         | 1010        | 2             | 0010        | STX        |
+| convert: add rax, rsi         | 1100        | 2             | 0010        | STX        |
+
+At this point, the characters "1" and "2" have been processed. The value of the integer is 12 (rax = 1100b)
