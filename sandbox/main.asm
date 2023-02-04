@@ -22,7 +22,7 @@ section .text
     convert:
         mov esi, [ecx]              ; Get the current character
         test ebx, max_number_size   ; break the loop
-        je _write_stdout
+        je _calculate_sum
         
     
         cmp esi, 48                 ; Anything less than char 0 is invalid (check ASCII table)
@@ -39,16 +39,21 @@ section .text
         inc ebx                     ; keep track of nbr of char processed
         jmp convert
         
-    ; _calculate_sum:
+    _calculate_sum:
     ; For each positive integer lower than the given number,
     ; calculate the some of all these integers
-
+    ; In the following, we sum all of them starting from highest to lowest
+        mov ecx, 0                  ; the total
+        _sum:
+            add ecx, eax
+            dec eax
+            test eax, 0
+            jnz _sum
 
     _write_stdout:
         mov eax, 4
         mov ebx, 1
-        mov ecx, input_buffer
-        mov edx, max_number_size
+        mov edx, 32
         int 80h
 
     _exit_0:
