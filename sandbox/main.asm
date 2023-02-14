@@ -1,59 +1,78 @@
-; TODO: trouver le nombre d'octets nécessaire pour stocker
-; la somme de tous les entiers positifs inférieurs à un nombre donné
 section .data
-    max_number_size: equ 2 ; max length of read input
+    max_number_size: equ 1
 
 section .bss
-    input_buffer: resb max_number_size ; used to store input number
+    input_buffer: resb max_number_size
 
 section .text
     global _start
-    _start:
-        mov eax, 3                  ; sys call read
-        mov ebx, 0                  ; from FD 0
-        mov ecx, input_buffer       ; indicate the adress of the memory buffer where the bytes will be stored
-        mov edx, max_number_size    ; read this quantity of character
-        int 80H                     ; store max_number_size to input_buffer from STDIN
+    _start:                     ; read user input
+
+        mov eax, 3
+        mov ebx, 0
+        mov ecx, input_buffer       ; tell syscall to store stuff pin input buffer
+        mov edx, max_number_size    ; The number of bytes to read
+        int 80H
+        cmp eax, -1                 ; read returns -1 on error
+        jz _exit_1
+        mov edi, eax                ; store into edi the number of bytes read
 
     atoi:
-        mov eax, 0                  ; Set initial total to 0
-        mov ebx, 0                  ; keep track of nbr of char processed
-        
-    convert:
-        mov esi, [ecx]              ; Get the current character
-        test ebx, max_number_size   ; break the loop
-        je _calculate_sum
-        
-    
-        cmp esi, 48                 ; Anything less than char 0 is invalid (check ASCII table)
-        jl _exit_1
+        mov eax, 0                  ; will store the actual number
+        mov ebx, 0                  ; keep track of number of char processed
 
-        cmp esi, 57                 ; Anything greater than char 9 is invalid (check ASCII table)
-        jg _exit_1
-        
-        sub esi, 48                 ; Convert from ASCII to decimal (0 starts at 48d in ASCII)
-        imul eax, 10                ; Multiply total by 10d
-        add eax, esi                ; Add current digit to total
-    
-        inc ecx                     ; Get the address of the next character
-        inc ebx                     ; keep track of nbr of char processed
-        jmp convert
-        
-    _calculate_sum:
-    ; For each positive integer lower than the given number,
-    ; calculate the some of all these integers
-    ; In the following, we sum all of them starting from highest to lowest
-        mov ecx, 0                  ; the total
-        _sum:
-            add ecx, eax
-            dec eax
-            test eax, 0
-            jnz _sum
+        atoi_convert:
+            movzx esi, byte [ecx]   ; move the char at adress ecx into esi.
+                                    ; esi is 32 bits, the char is 8, so use movzx with the byte op
+            cmp ebx, edi            ; if nbr_char_processed == nbr_char_read then break loop
+            je _calculate_sum
 
-    _write_stdout:
+            cmp esi, 48             ; Anything less than char 0 is invalid (check ASCII table)
+            jl _exit_1
+
+            cmp esi, 57             ; Anything greater than char 9 is invalid (check ASCII table)
+            jg _exit_1
+
+            sub esi, 48             ; Convert from ASCII to decimal (0 starts at 48d in ASCII)
+            imul eax, 10            ; Multiply total by 10d
+            add eax, esi            ; Add current digit to total
+
+            inc ecx                 ; Get the address of the next character
+            inc ebx                 ; keep track of nbr of char processed
+            jmp atoi_convert
+
+_calculate_sum:
+    mov ecx, eax
+    mov eax, 0
+    .count:
+        add eax, ecx
+        dec ecx
+        cmp ecx, 0
+        jne .count
+
+    ; This code is referenced from <https://stackoverflow.com/a/46301894>.
+    ; Basically, take each byte, from right to left
+    print_uint32:
+        xor ebx, ebx                ; set ebx to 0
+        mov ecx, 0xa                ; 10
+        push ecx                    ; send ecx (10) to the stack
+        mov esi, esp
+        add esp, 4                  ; point 4 bytes further into the stack
+    .toascii_digit:
+        inc ebx                     ; Number of digits to output
+        xor edx, edx                ; set edx to 0
+        div ecx                     ; divide eax by ecx
+        add edx, '0'                ; edx contains remainder, add the ascii value of 0 to it. If edx = 5d, then it's equivalent to add edx, 48d -> 53d (which is the decimal value of the char "5" in ascii)
+        dec esi                     ; go check the next byte
+        mov [esi], dl
+
+        test eax, eax               ; eax is altered by the div above (it gets the quotient of the division)
+        jnz .toascii_digit
+
+        mov edx, ebx
         mov eax, 4
         mov ebx, 1
-        mov edx, 32
+        mov ecx, esi
         int 80h
 
     _exit_0:
