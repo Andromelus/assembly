@@ -28,7 +28,8 @@
             "type": "pickString",
             "options": [
                 "hello_world",
-                "sandbox"
+                "sandbox",
+                "golf-triangular-numbers"
             ],
             "description": "The program concerned by the command"
         }
