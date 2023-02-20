@@ -17,7 +17,16 @@ section .text
     mov edx, graph_header_len
     int 80h
 ; READ filename from STDIN
-
+    _read_filename:
+    # TODO error here if more than one byte provided
+        mov eax, 3
+        mov ebx, 0
+        mov ecx, read_input_buffer
+        mov edx, read_bytes_size
+        int 80H
+        cmp eax, -1
+       
+        .read_byte:
 
 ; READ content of filename
     ; clear current concated bytes
